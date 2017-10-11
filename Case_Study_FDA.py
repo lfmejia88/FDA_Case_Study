@@ -9,7 +9,6 @@ import pandas as pd
 from pandas.io.json import json_normalize
 import matplotlib.pyplot as plt
 from scipy import stats
-import vincent
 
 data = pd.DataFrame()
 years = ['2013','2014','2015','2016']
@@ -73,7 +72,3 @@ age_med = age.pivot_table(index=age.index, columns='medicinalproduct', values='p
 age_med.plot.box()
 
 
-
-data.to_csv(r'C:\Users\mejialu\Documents\Astra1.csv', index=False)
-drugs.to_csv(r'C:\Users\mejialu\Documents\Astra2.csv', index=False)
-reactions.to_csv(r'C:\Users\mejialu\Documents\Astra3.csv', index=False)
