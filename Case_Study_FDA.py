@@ -8,7 +8,7 @@ import json,urllib
 import pandas as pd
 from pandas.io.json import json_normalize
 import matplotlib.pyplot as plt
-from scipy import stats
+import seaborn as sns
 
 data = pd.DataFrame()
 years = ['2013','2014','2015','2016']
@@ -49,9 +49,10 @@ for i,item in enumerate(data['drug']):
     drug = drug.assign(safetyreportid = data['safetyreportid'][i], occurcountry = data['occurcountry'][i], patientonsetage = data['patientonsetage'][i], patientonsetageunit = data['patientonsetageunit'][i])
     drugs = drugs.append(drug)
 
+print 'Datasets created'
 ### Data Analysis   
 
-#Plotting Seriosness of events in top 10 countries by number of reports
+#Plotting Seriousness of events in top 10 countries by number of reports
 top_10_country = data['safetyreportid'].groupby(data['occurcountry']).count().sort_values(axis=0,ascending=False)[:10]
 columnscr = ["occurcountry","seriousnesscongenitalanomali","seriousnessdisabling","seriousnesslifethreatening","seriousnessdeath","seriousnesshospitalization","seriousnessother"]
 serious = pd.DataFrame(data[list(columnscr)].values)  
@@ -60,6 +61,7 @@ serious= serious[serious['occurcountry'].isin(top_10_country.index.tolist())]
 country_serious = serious.groupby(serious['occurcountry']).count()
 plt.style.use('fivethirtyeight')
 country_serious.plot.bar()
+plt.legend(fontsize=20,loc='top_left');plt.title('Seriousness of Events by Country');plt.yticks(size= 20);plt.xticks(size= 20)
 
 
 #Patient Age Distribution by Medicine
@@ -70,5 +72,17 @@ age['patientonsetage'] = age['patientonsetage'].astype('float64')
 age = age.reset_index()
 age_med = age.pivot_table(index=age.index, columns='medicinalproduct', values='patientonsetage')
 age_med.plot.box()
+plt.title('Age Distribution by Product');plt.yticks(size= 20);plt.xticks(size= 20)
+
+
+#Correlation Between Reactions
+pair_react = pd.get_dummies(reactions, columns=['reactionmeddrapt'],prefix='', prefix_sep='').groupby(['safetyreportid'], as_index=False).sum()
+columnscr = ['Drug ineffective','Death','Nausea','Dyspnoea','Malaise','Off label use','Malaise','Headache','Fatigue','Arthralgia','Vomiting','Pain']
+cr = pd.DataFrame(pair_react[list(columnscr)].values)
+cr.columns = columnscr
+cm = cr.corr(method='kendall')
+sns.heatmap(cm, annot=True)
+plt.yticks(size= 20, rotation=0)
+plt.xticks(size= 20, rotation=0)
 
 
